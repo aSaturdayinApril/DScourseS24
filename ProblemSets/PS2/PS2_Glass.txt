@@ -1,0 +1,41 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{PS2_Glass.tex}
+\author{d.glass }
+\date{January 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Main Tools}
+\begin{itemize}
+    \item Programming Languages:
+    \begin{itemize}
+        \item R
+        \item Python
+        \item SQL
+    \end{itemize}
+    
+    \item Data Analysis Tools:
+    \begin{itemize}
+        \item RStudio
+        \item Jupyter
+        \item Julia
+    \end{itemize}
+    
+    \item Version Control:
+    \begin{itemize}
+        \item Git
+        \item GitHub
+    \end{itemize}
+    
+    \item Chatbot Tools:
+    \begin{itemize}
+        \item ChatGPT
+        \item Copilot
+    \end{itemize}
+\end{itemize}
+
+\end{document}
