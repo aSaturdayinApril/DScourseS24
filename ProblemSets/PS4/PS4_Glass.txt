@@ -1,0 +1,17 @@
+if (!require("utils")) install.packages("utils")
+system("wget -O dates.json https://www.vizgr.org/historical-events/search.php?format=json&begin_date=00000101&end_date=20240209&lang=en")
+if (!require("jsonlite")) install.packages("jsonlite")
+if (!require("tidyverse")) install.packages("tidyverse")
+
+library(jsonlite)
+library(tidyverse)
+
+
+json_content <- readLines("dates.json")
+mylist <- fromJSON('dates.json')
+mydf <- bind_rows(mylist$result[-1])
+class(mydf)
+class(mydf$date)
+View(head(mydf, 6))
+
+
