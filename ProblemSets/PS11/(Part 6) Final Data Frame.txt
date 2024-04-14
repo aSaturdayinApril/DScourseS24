@@ -1,0 +1,47 @@
+DivFreq <- DivFreq[!(DivFreq$divcount < 40 & DivFreq$DivYield < 16), ]
+DivFreq <- DivFreq[DivFreq$DivYield > 6, ]
+DivYield <- DivYield[DivYield$divcount >= 20, ]
+
+
+if (!require(ggplot2)) install.packages("ggplot2")
+
+# Plot for DivYield
+ggplot(DivYield, aes(x = DivYield, y = divcount)) +
+  geom_point() +
+  theme_minimal() +
+  ggtitle("Scatter Plot for DivYield (after filter)") +
+  scale_x_continuous("Dividend Yield", limits = c(0, NA), expand = c(0, 0)) +
+  scale_y_continuous("Number of Dividends Paid Since Jan 2019", limits = c(0, NA), expand = c(0, 0))
+
+# Plot for DivFreq
+ggplot(DivFreq, aes(x = DivYield, y = divcount)) +
+  geom_point() +
+  theme_minimal() +
+  ggtitle("Scatter Plot for DivFreq (after filter)") +
+  scale_x_continuous("Dividend Yield", limits = c(0, NA), expand = c(0, 0)) +
+  scale_y_continuous("Number of Dividends Paid Since Jan 2019", limits = c(0, NA), expand = c(0, 0))
+
+if (!require(dplyr)) install.packages("dplyr")
+
+# Stack DivYield and DivFreq into a new data frame
+Final <- rbind(DivYield, DivFreq)
+
+# Remove duplicates based on the Symbol column
+Final <- Final %>% distinct(Symbol, .keep_all = TRUE)
+
+# Check if the 'writexl' package is installed, if not, install it
+if (!require("writexl")) {
+  install.packages("writexl")
+}
+
+# Load the writexl package
+library(writexl)
+
+# Set the working directory to your desired location
+setwd("YOUR WD HERE")
+
+# Assuming 'Final' is your existing dataframe, replace it with your actual dataframe name
+# Export the dataframe to an Excel file named 'Final.xlsx' in the working directory
+write_xlsx(Final, path = "Final.xlsx")
+
+

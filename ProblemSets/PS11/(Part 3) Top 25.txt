@@ -1,0 +1,16 @@
+if (!require("dplyr")) install.packages("dplyr")
+
+# Assuming Div is your data frame
+# Select top 25 rows with highest values in divcount
+DivFreq <- Div %>% 
+  arrange(desc(divcount)) %>% 
+  head(25)
+
+# Select top 25 rows with highest values in Div. Yield
+DivYield <- Div %>% 
+  arrange(desc(DivYield)) %>% 
+  head(25)
+
+# View the resulting data frames
+View(DivFreq)
+View(DivYield)

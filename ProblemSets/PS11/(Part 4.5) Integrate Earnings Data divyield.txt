@@ -1,0 +1,72 @@
+if (!require("httr")) install.packages("httr")
+if (!require("dplyr")) install.packages("dplyr")
+
+library(httr)
+library(dplyr)
+
+# Define function to retrieve earnings data from Alpha Vantage
+get_earnings_data <- function(symbol, api_key) {
+  url <- paste0("https://www.alphavantage.co/query?function=EARNINGS&symbol=", symbol, "&apikey=", api_key)
+  response <- GET(url)
+  if (http_error(response)) {
+    stop("HTTP error ", response$status_code)
+  } else {
+    data <- content(response, as = "parsed")
+    if ("Note" %in% names(data)) {
+      stop("API limit reached. Please try again later.")
+    } else {
+      return(data)
+    }
+  }
+}
+
+# Function to process earnings data for a symbol
+process_symbol <- function(symbol, api_key) {
+  earnings_data <- get_earnings_data(symbol, api_key)
+  # Extracting fiscalDateEnding and reportedEPS from earnings_data
+  fiscal_date_ending <- unlist(lapply(earnings_data$annualEarnings, `[[`, "fiscalDateEnding"))
+  reported_eps <- unlist(lapply(earnings_data$annualEarnings, `[[`, "reportedEPS"))
+  # Create a vector of the symbol used in earnings_data
+  symbol_used <- rep(symbol, length(fiscal_date_ending))
+  # Creating the Ecalc dataframe
+  Ecalc <- data.frame(Symbol = symbol_used, fiscalDateEnding = fiscal_date_ending, reportedEPS = reported_eps)
+  # Convert reportedEPS column to numeric (if not already numeric)
+  Ecalc$reportedEPS <- as.numeric(Ecalc$reportedEPS)
+  # Check for non-numeric values
+  if (any(is.na(Ecalc$reportedEPS))) {
+    stop("Column 'reportedEPS' contains non-numeric values.")
+  }
+  # Summarize reportedEPS column
+  summary_eps <- table(sign(Ecalc$reportedEPS))
+  # Create PN dataframe
+  PN <- data.frame(
+    Symbol = symbol,
+    Pos = ifelse("1" %in% names(summary_eps), summary_eps["1"], 0),
+    Neg = ifelse("-1" %in% names(summary_eps), summary_eps["-1"], 0),
+    Even = ifelse("0" %in% names(summary_eps), summary_eps["0"], 0)
+  )
+  return(PN)
+}
+
+# Initialize an empty dataframe to store results
+PN <- data.frame(Symbol = character(), Pos = numeric(), Neg = numeric(), Even = numeric())
+
+# Loop through each symbol in the "Symbol" column of DivYield dataframe
+for (symbol in DivYield$Symbol) {
+  # Process earnings data for the current symbol and append to PN dataframe
+  PN <- rbind(PN, process_symbol(symbol, "API KEY HERE")) # Assuming "BHJQ9U43IS73GOD8" is your API key
+}
+
+# Merge PN and DivYield based on the Symbol column
+DivYield <- merge(DivYield, PN, by = "Symbol", all.x = TRUE)
+
+# Calculate the total (T) for each row
+DivYield <- mutate(DivYield, T = Pos + Neg + Even)
+
+# Calculate the Nratio for each row
+DivYield <- mutate(DivYield, Nratio = Neg / T)
+
+# View the updated DivYield dataframe
+View(DivYield)
+
+rm(PN)

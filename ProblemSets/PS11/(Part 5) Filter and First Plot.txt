@@ -1,0 +1,37 @@
+# Remove rows with Nratio >= 0.2 from DivYield
+DivYield <- subset(DivYield, Nratio < 0.2)
+# Remove rows with Nratio >= 0.2 from DivFreq
+DivFreq <- subset(DivFreq, Nratio < 0.2)
+
+
+if (!require(ggplot2)) install.packages("ggplot2")
+
+# Plot for DivYield
+ggplot(DivYield, aes(x = DivYield, y = divcount)) +
+  geom_point() +
+  theme_minimal() +
+  ggtitle("Scatter Plot for DivYield") +
+  scale_x_continuous("Dividend Yield", limits = c(0, NA), expand = c(0, 0)) +
+  scale_y_continuous("Number of Dividends Paid Since Jan 2019", limits = c(0, NA), expand = c(0, 0))
+
+# Plot for DivFreq
+ggplot(DivFreq, aes(x = DivYield, y = divcount)) +
+  geom_point() +
+  theme_minimal() +
+  ggtitle("Scatter Plot for DivFreq") +
+  scale_x_continuous("Dividend Yield", limits = c(0, NA), expand = c(0, 0)) +
+  scale_y_continuous("Number of Dividends Paid Since Jan 2019", limits = c(0, NA), expand = c(0, 0))
+
+
+
+
+
+
+
+
+
+
+
+
+
+

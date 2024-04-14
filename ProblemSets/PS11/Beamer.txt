@@ -1,0 +1,46 @@
+\documentclass{beamer}
+\usetheme{default}
+\usepackage{graphicx}
+
+\title{Data Science Final Project}
+\author{Daniel Glass}
+\date{May 2024}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}{Introduction}
+\begin{itemize}
+\item Using financial and stock market data for investment purposes.
+\item Motivation: Gain insights into potential investments using new skills in data science.
+\item Objective: Cut through market noise to find investments aligned with personal interests, such as dividend-paying stocks with low risk and growth potential.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Literature Review}
+\begin{itemize}
+\item Stability of dividend stocks: Consistent returns incentivize long-term investment, reducing volatility.
+\item Investor preferences: Dividend stocks attract retail investors, particularly older and low-income investors, leading to longer holding periods.
+\item Market influences on dividend decisions: Market demand and sentiment influence firms' decisions to pay dividends, impacting stock selection strategies.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Data and Methods}
+\begin{itemize}
+\item Data source: Initial dataset sourced from stockanalysis.com, containing information on Symbol, Dividend Yield, and Payout Ratio.
+\item Filtering methods: Filtering for dividend yield, payout ratio, and historical consistency to refine the list of potential investments.
+\item Methods for assessing historical consistency: Utilizing dividend payment history and financial data to select promising stock tickers.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Findings and Conclusion}
+\begin{itemize}
+\item Findings: Identification of 18 promising stock tickers meeting criteria for healthy dividend yields, consistent frequency, and positive historical profits.
+\item Conclusion: Summary of project objectives, methods, and findings. Emphasis on informed decision-making in building an investment portfolio aligned with long-term financial goals.
+\end{itemize}
+\end{frame}
+
+\end{document}

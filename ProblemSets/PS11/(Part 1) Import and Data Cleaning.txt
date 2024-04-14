@@ -1,0 +1,30 @@
+# Set working directory
+setwd("C:/Users/spork/Desktop")
+
+# Load required package
+if (!require("readr")) install.packages("readr")
+library(readr)
+
+# Import CSV file
+Div <- read_csv("Div.csv")
+
+if (!require("dplyr")) install.packages("dplyr")
+
+# Assuming Div is your data frame
+# Convert "DivYield" column to numeric, removing "%" sign
+Div$DivYield <- as.numeric(gsub("%", "", Div$`Div. Yield`))
+
+# Remove rows where the value in "DivYield" column is 0, and exclude NA values
+Div <- Div[!is.na(Div$DivYield) & Div$DivYield > 0, ]
+
+# Remove the "Div. Yield" column
+Div <- subset(Div, select = -c(`Div. Yield`))
+
+# Remove "%" sign from "Payout Ratio" column and convert it to numeric
+Div$`Payout Ratio` <- as.numeric(gsub("%", "", Div$`Payout Ratio`))
+
+# Remove rows where the value in "Payout Ratio" column is over 100%
+Div <- Div[Div$`Payout Ratio` <= 100, ]
+
+# View the modified data
+View(Div)
