@@ -1,0 +1,29 @@
+DivFreq <- DivFreq[!(DivFreq$divcount < 30 & DivFreq$`Div. Growth` < 12), ]
+DivGrowth <- DivGrowth[DivGrowth$divcount < 25 & DivGrowth$`Div. Growth` < 200, ]
+
+
+
+if (!require(dplyr)) install.packages("dplyr")
+
+# Stack DivYield and DivFreq into a new data frame
+Final <- rbind(DivGrowth, DivFreq)
+
+# Remove duplicates based on the Symbol column
+Final <- Final %>% distinct(Symbol, .keep_all = TRUE)
+
+# Check if the 'writexl' package is installed, if not, install it
+if (!require("writexl")) {
+  install.packages("writexl")
+}
+
+# Load the writexl package
+library(writexl)
+
+# Set the working directory to your desired location
+setwd("C:/Users/spork/Desktop")
+
+# Assuming 'Final' is your existing dataframe, replace it with your actual dataframe name
+# Export the dataframe to an Excel file named 'Final.xlsx' in the working directory
+write_xlsx(Final, path = "Final.xlsx")
+
+

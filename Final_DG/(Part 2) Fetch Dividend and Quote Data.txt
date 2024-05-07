@@ -1,0 +1,98 @@
+if (!require("quantmod")) 
+  install.packages("quantmod")
+library(quantmod)
+
+if (!require("tibble")) 
+  install.packages("tibble")
+library(tibble)
+
+# Remove rows where Symbol ends with a letter
+Div <- Div %>%
+  filter(!grepl("\\.[a-zA-Z]$", Symbol))
+
+# Remove rows with negative values in "Div. Growth" or "Div. CAGR 5Y" columns
+Div <- Div %>% 
+  filter(`Div. Growth` >= 0 & `Div. CAGR 5Y` >= 0)
+
+# Initialize an empty dataframe to store the results
+StackHere <- data.frame()
+
+# Iterate over each symbol
+for (symbol in Div$Symbol) {
+  tryCatch({
+    # Define the start/end dates for both dividend and quote data
+    start_date <- "2019-01-01"
+    end_date <- Sys.Date()
+    
+    # Fetch dividend data
+    dividends <- getDividends(symbol, from = start_date, to = end_date)
+    dividends <- as.data.frame(dividends)
+    dividends <- rownames_to_column(dividends, var = "Date")
+    
+    # Fetch quote data for the symbol
+    quotes <- getSymbols(symbol, from = start_date, to = end_date, auto.assign = FALSE)
+    quotes <- data.frame(Date = index(quotes), coredata(quotes))
+    
+    # Remove columns ending in .Open, .High, .Low, .Volume, .Adjusted
+    remove_columns <- c(".Open", ".High", ".Low", ".Volume", ".Adjusted")
+    quotes <- quotes[, !grepl(paste0(remove_columns, collapse = "|"), names(quotes))]
+    
+    # Merge dividends and quotes into a new data frame named Merge
+    Merge <- merge(dividends, quotes, by = "Date", all = FALSE)
+    
+    # Add a new column for the ticker symbol
+    Merge$Symbol <- symbol
+    
+    # Add a new column for the count of rows in Merge
+    Merge$divcount <- nrow(Merge)
+    
+    # Calculate the yield and multiply by 100
+    Merge$yield <- Merge[, paste0(symbol, ".div")] / Merge[, paste0(symbol, ".Close")] * 100
+    
+    # Calculate average yield
+    avg_yield <- sum(Merge$yield) / Merge$divcount[1]
+    
+    # Create a temporary dataframe for the current symbol
+    temp_df <- data.frame(
+      Symbol = symbol,
+      avgYield = avg_yield,
+      divcount = Merge$divcount[1]
+    )
+    
+    # Stack the temporary dataframe onto the StackHere dataframe
+    StackHere <- rbind(StackHere, temp_df)
+    
+  }, error = function(e) {
+    cat("An error occurred for symbol", symbol, ":", e$message, "\n")
+  })
+}
+
+if (!require("dplyr")) install.packages("dplyr")
+
+# Merge based on the "Symbol" column and specify the columns to include
+Div <- merge(Div, StackHere, by = "Symbol", all = FALSE)
+
+# View the resulting data frame
+View(Div)
+
+# Remove unnecessary objects from memory
+rm(dividends, Merge, quotes, StackHere, temp_df)
+
+
+if (!require("dplyr")) install.packages("dplyr")
+
+# Assuming Div is your data frame
+# Select top 25 rows with highest values in divcount
+DivFreq <- Div %>% 
+  arrange(desc(divcount)) %>% 
+  head(25)
+
+# Select top 25 rows with highest values in Div. Growth
+DivGrowth <- Div %>% 
+  arrange(desc(`Div. Growth`)) %>% 
+  head(25)
+
+# View the resulting data frames
+View(DivFreq)
+View(DivGrowth)
+
