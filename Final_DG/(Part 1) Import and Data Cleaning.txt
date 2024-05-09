@@ -1,0 +1,24 @@
+# Set working directory
+setwd("C:/Users/spork/Desktop")
+
+# Load required package
+if (!require("readr")) install.packages("readr")
+library(readr)
+
+# Import CSV file
+Div <- read_csv("Div.csv")
+
+if (!require("dplyr")) install.packages("dplyr")
+
+# Convert columns to numeric and remove '%' signs
+Div <- Div %>%
+  mutate_at(vars(`Div. Yield`, `Payout Ratio`, `Div. Growth`, `Div. CAGR 5Y`, 'Years', 'Change 3Y'),
+            ~ as.numeric(sub("%", "", .)))
+
+# Remove rows with missing values
+Div <- na.omit(Div)
+
+model <- lm(`Change 3Y` ~ `Div. Yield` + `Payout Ratio` + `Div. Growth` + `Div. CAGR 5Y` + Years, data = Div)
+ 
+ # View summary of the regression model
+summary(model)
